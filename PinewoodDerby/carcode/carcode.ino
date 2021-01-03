@@ -4,6 +4,7 @@
 const int run_duration = 3000;
 const int maxBrightness = 60; // up to 255. More bright, more amps
 const int runningBrightness = 50; // up to 255. More bright, more amps
+const int led_cylcle_time = 100; //change led color every this many ms
 const int LED_PIN = 7;
 const int NUM_LEDS = 8;
 CRGB leds[NUM_LEDS];
@@ -81,9 +82,10 @@ void loop() {
 
 void lights()
 {
+  //debounce doesn't seem necessary
   //unsigned long interrupt_time = millis();
-
-  //if (interrupt_time - lastInterruptTimestamp > 200) {
+  //if (interrupt_time - lastInterruptTimestamp > 200) {}
+  
   byte switchstatus = digitalRead(pulluppin);
   Serial.println("Pin is: " + String(switchstatus));
 
@@ -140,7 +142,7 @@ void finishLineLEDSequence()
   //finishLineLEDIteration
   FastLED.setBrightness(maxBrightness);
   unsigned long now = millis();
-  if (now - lastFinishedTimestamp > 100) {
+  if (now - lastFinishedTimestamp > led_cylcle_time) {
 
     for (int i = 0; i < 8 / NUM_LEDS; i++) {
       int m = i * 8; //multiplier to shorten code
@@ -200,7 +202,7 @@ void runningLEDSequence()
 {
   unsigned long now = millis();
 
-  if (now - lastRunningTimestamp > 100) {
+  if (now - lastRunningTimestamp > led_cylcle_time) {
     FastLED.setBrightness(runningBrightness);
     for (int i = 0; i < NUM_LEDS; i++) {
       leds[i] = CRGB::Red;
@@ -216,7 +218,7 @@ void runningLEDSequence()
 
 void IdleLEDSequence()
 {
-  if (millis() - lastIdleTimestamp > 100) {
+  if (millis() - lastIdleTimestamp > led_cylcle_time) {
     for (int i = 0; i < NUM_LEDS; i++) {
       leds[i] = GetRandomColor();
     }
