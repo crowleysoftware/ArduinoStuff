@@ -1,4 +1,7 @@
 #include <FastLED.h>
+#include "carstate.h"
+
+const int run_duration = 3000;
 const int maxBrightness = 60;
 const int runningBrightness = 50;
 const int LED_PIN = 7;
@@ -14,18 +17,18 @@ const int I3 = 9;
 const int I4 = 10;
 const int pulluppin = 2;
 
-bool idle = true;
-bool go = false;
-bool hasRun = false;
+carstate current_state = IDLING;
 
 unsigned long starttime;
 unsigned long looptime;
 unsigned long lastIdleTimestamp;
 unsigned long lastRunningTimestamp;
 unsigned long lastFinishedTimestamp;
+static unsigned long lastInterruptTimestamp;
 int finishLineLEDIteration = 0;
 
 int switchstatus = LOW;
+volatile byte switchstate = LOW;
 
 void setup() {
   Serial.begin(9600);
@@ -41,97 +44,87 @@ void setup() {
   pinMode(I3, OUTPUT);
   pinMode(I4, OUTPUT);
 
-  pinMode(2, INPUT_PULLUP);
+  pinMode(pulluppin, INPUT_PULLUP);
 
   FastLED.setBrightness(maxBrightness);
   lastIdleTimestamp = millis();
   IdleLEDSequence();
+
+  attachInterrupt(digitalPinToInterrupt(pulluppin), lights, CHANGE);
 }
 
 void loop() {
 
   looptime = millis();
-  switchstatus = digitalRead(pulluppin);
 
-  int currentState = State();
-  //Serial.println(String(currentState));
-
-  switch (currentState) {
-    case 0:
+  switch (current_state)
+  {
+    case IDLING:
+    case READY:
       IdleLEDSequence();
       break;
-  }
-
-  if (switchstatus == HIGH && !go && idle) {
-    IdleLEDSequence();
-  }
-
-  /*
-    if (switchstatus == LOW) {
-      Serial.println("Low");
-    } else {
-      Serial.println("High");
-    }
-  */
-  if (switchstatus == HIGH && idle) {
-    idle = false;
-  }
-
-  if (!idle) {
-    if (!go) {
-      if (switchstatus == LOW) {
-        Serial.println("GO!");
-        go = true;
-        StartMotor();
-        starttime = millis();
-        lastRunningTimestamp = millis();
-      }
-    } else {
-      if (looptime - starttime > 3000) {
+    case RUNNING:
+      if (looptime - starttime > run_duration) {
         StopMotor();
         lastFinishedTimestamp = millis();
         finishLineLEDSequence();
+      } else {
+        runningLEDSequence();
       }
-    }
-  }
-
-  switch (State()) {
-    case 1:
-      runningLEDSequence();
       break;
-    case 2:
+    case FINISHED:
       finishLineLEDSequence();
       break;
   }
 }
 
-int State() {
-  if (!hasRun) {
-    return 0; //"idle";
-  }
+void lights()
+{
+  //unsigned long interrupt_time = millis();
 
-  if (!idle && go && switchstatus == LOW) {
-    return 1; // "running";
-  }
+  //if (interrupt_time - lastInterruptTimestamp > 200) {
+  byte switchstatus = digitalRead(pulluppin);
+  Serial.println("Pin is: " + String(switchstatus));
 
-  if (idle && !go) {
-    return 2; //"finished";
+  switch (current_state)
+  {
+    case IDLING:
+      if (switchstatus == HIGH) {
+        current_state = READY;
+        Serial.println("Transistion from IDLING to READY");
+      }
+      break;
+    case READY:
+      if (switchstatus == LOW) {
+        current_state = RUNNING;
+        StartMotor();
+        starttime = millis();
+        Serial.println("Transistion from READY to RUNNING");
+      }
+      break;
+    case RUNNING:
+      Serial.println("No transition while running");
+      break;
+    case FINISHED:
+      if (switchstatus == HIGH) {
+        current_state = READY;
+        Serial.println("Transistion from FINISHED to READY");
+      }
+      break;
   }
-
-  return 0; //"idle";
 }
 
 void StopMotor()
 {
   digitalWrite(E1, LOW);
   digitalWrite(E2, LOW);
-  idle = true;
-  go = false;
+  current_state = FINISHED;
 }
 
 void StartMotor()
 {
-  hasRun = true;
+  Serial.println("Get your motor running..!");
+
   //Set motors speed
   analogWrite(E1, 255);
   analogWrite(E2, 255);

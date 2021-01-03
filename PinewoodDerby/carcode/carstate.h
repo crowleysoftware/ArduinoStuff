@@ -1,0 +1,1 @@
+enum carstate{IDLING,READY, RUNNING, FINISHED};
