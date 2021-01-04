@@ -85,7 +85,7 @@ void lights()
   //debounce doesn't seem necessary
   //unsigned long interrupt_time = millis();
   //if (interrupt_time - lastInterruptTimestamp > 200) {}
-  
+
   byte switchstatus = digitalRead(pulluppin);
   Serial.println("Pin is: " + String(switchstatus));
 
@@ -144,55 +144,81 @@ void finishLineLEDSequence()
   unsigned long now = millis();
   if (now - lastFinishedTimestamp > led_cylcle_time) {
 
-    for (int i = 0; i < (NUM_LEDS / 8); i++) {
-      int m = i * 8; //multiplier to shorten code
+    int m = 0; //multiplier to shorten code
 
-      switch (finishLineLEDIteration) {
-        case 0:
+    switch (finishLineLEDIteration) {
+      case 0:
+        for (int i = 0; i < (NUM_LEDS / 8); i++) {
+          m = i * 8;
           leds[0 + m] = leds[7 + m] = CRGB::Green;
           leds[1 + m] = leds[2 + m] = leds[3 + m] = leds[4 + m] = leds[5 + m] = leds[6 + m] = CRGB(0, 0, 0);
-          finishLineLEDIteration = 1;
-          break;
-        case 1:
+        }
+        finishLineLEDIteration = 1;
+        break;
+      case 1:
+        for (int i = 0; i < (NUM_LEDS / 8); i++) {
+          m = i * 8;
           leds[0 + m] = leds[1 + m] = leds[6 + m] = leds[7 + m] = CRGB::Green;
           leds[2 + m] = leds[3 + m] = leds[4 + m] = leds[5 + m] = CRGB(0, 0, 0);
-          finishLineLEDIteration = 2;
-          break;
-        case 2:
+        }
+        finishLineLEDIteration = 2;
+        break;
+      case 2:
+        for (int i = 0; i < (NUM_LEDS / 8); i++) {
+          m = i * 8;
           leds[0 + m] = leds[1 + m] = leds[2 + m] = leds[5 + m] = leds[6 + m] = leds[7 + m] = CRGB::Green;
           leds[3 + m] = leds[4 + m] = CRGB(0, 0, 0);
-          finishLineLEDIteration = 3;
-          break;
-        case 3:
+        }
+        finishLineLEDIteration = 3;
+        break;
+      case 3:
+        for (int i = 0; i < (NUM_LEDS / 8); i++) {
+          m = i * 8;
           leds[0 + m] = leds[1 + m] = leds[2 + m] = leds[3 + m] = leds[4 + m] = leds[5 + m] = leds[6 + m] = leds[7 + m] = CRGB::Green;
-          finishLineLEDIteration = 4;
-          break;
-        case 4:
+        }
+        finishLineLEDIteration = 4;
+        break;
+      case 4:
+        for (int i = 0; i < (NUM_LEDS / 8); i++) {
+          m = i * 8;
           leds[0 + m] = leds[1 + m] = leds[2 + m] = leds[5 + m] = leds[6 + m] = leds[7 + m] = CRGB(0, 0, 0);
           leds[3 + m] = leds[4 + m] = CRGB::Green;
-          finishLineLEDIteration = 5;
-          break;
-        case 5:
+        }
+        finishLineLEDIteration = 5;
+        break;
+      case 5:
+        for (int i = 0; i < (NUM_LEDS / 8); i++) {
+          m = i * 8;
           leds[0 + m] = leds[1 + m] = leds[3 + m] = leds[4 + m] = leds[6 + m] = leds[7 + m] = CRGB(0, 0, 0);
           leds[2 + m] = leds[5 + m] = CRGB::Green;
-          finishLineLEDIteration = 6;
-          break;
-        case 6:
+        }
+        finishLineLEDIteration = 6;
+        break;
+      case 6:
+        for (int i = 0; i < (NUM_LEDS / 8); i++) {
+          m = i * 8;
           leds[0 + m] = leds[2 + m] = leds[3 + m] = leds[4 + m] = leds[5 + m] = leds[7 + m] = CRGB(0, 0, 0);
-          leds[1 + m] = leds[6 + m] = CRGB::Green;          
-          finishLineLEDIteration = 7;
-          break;
-        case 7:
+          leds[1 + m] = leds[6 + m] = CRGB::Green;
+        }
+        finishLineLEDIteration = 7;
+        break;
+      case 7:
+        for (int i = 0; i < (NUM_LEDS / 8); i++) {
+          m = i * 8;
           leds[0 + m] = leds[7 + m] = CRGB::Green;
-          leds[1 + m] = leds[2 + m] = leds[3 + m] = leds[4 + m] = leds[5 + m] = leds[6 + m] = CRGB(0, 0, 0);          
-          finishLineLEDIteration = 8;
-          break;
-        case 8:
+          leds[1 + m] = leds[2 + m] = leds[3 + m] = leds[4 + m] = leds[5 + m] = leds[6 + m] = CRGB(0, 0, 0);
+        }
+        finishLineLEDIteration = 8;
+        break;
+      case 8:
+        for (int i = 0; i < (NUM_LEDS / 8); i++) {
+          m = i * 8;
           leds[0 + m] = leds[1 + m] = leds[2 + m] = leds[3 + m] = leds[4 + m] = leds[5 + m] = leds[6 + m] = leds[7 + m] = CRGB(0, 0, 0);
-          finishLineLEDIteration = 0;
-          break;
-      }
+        }
+        finishLineLEDIteration = 0;
+        break;
     }
+
     FastLED.show();
     lastFinishedTimestamp = millis();
   }
