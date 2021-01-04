@@ -6,7 +6,7 @@ const int maxBrightness = 60; // up to 255. More bright, more amps
 const int runningBrightness = 50; // up to 255. More bright, more amps
 const int led_cylcle_time = 100; //change led color every this many ms
 const int LED_PIN = 7;
-const int NUM_LEDS = 8;
+const int NUM_LEDS = 16;
 CRGB leds[NUM_LEDS];
 
 const int E1 = 5; // Enable Pin for motor
@@ -144,7 +144,7 @@ void finishLineLEDSequence()
   unsigned long now = millis();
   if (now - lastFinishedTimestamp > led_cylcle_time) {
 
-    for (int i = 0; i < 8 / NUM_LEDS; i++) {
+    for (int i = 0; i < (NUM_LEDS / 8); i++) {
       int m = i * 8; //multiplier to shorten code
 
       switch (finishLineLEDIteration) {
@@ -188,7 +188,7 @@ void finishLineLEDSequence()
           finishLineLEDIteration = 8;
           break;
         case 8:
-          leds[0] = leds[1] = leds[2] = leds[3] = leds[4] = leds[5] = leds[6] = leds[7] = CRGB(0, 0, 0);
+          leds[0 + m] = leds[1 + m] = leds[2 + m] = leds[3 + m] = leds[4 + m] = leds[5 + m] = leds[6 + m] = leds[7 + m] = CRGB(0, 0, 0);
           finishLineLEDIteration = 0;
           break;
       }
