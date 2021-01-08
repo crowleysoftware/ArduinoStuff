@@ -1,8 +1,15 @@
 ARD 5v -> BB+
 ARD Gnd -> BB-
+
 ARD2~ -> limit switch C
-limit switch NO -> BB-
-L293D +Vmotor (8) -> BB+
+limit switch NO -> ARD GND
+
+L293D +Vmotor (8) -> Battery +
+L293D OUT1 -> Motor 1 terminal
+L293D OUT2 -> Motor 1 terminal
+L293D OUT3 -> Motor 2 terminal
+L293D OUT4 -> Motor 2 terminal
+
 ARD3~ -> L293D IN2 (7)
 ARD4~ -> L293D IN1 (2)
 ARD5~ -> L293D EN1 (1)
@@ -11,7 +18,7 @@ ARD9~ -> L293D IN3 (10)
 ARD10~ -> L293D IN4 (15)
 L293D +V (16) -> BB+
 
-ARD7~ -> 330Ω -> 330Ω -> LED strip In
+ARD7~ -> 330Ω -> LED strip In
 BB+ -> LED strip VCC
 BB- -> LED strip GND
 

@@ -1,9 +1,9 @@
 #include <FastLED.h>
 #include "carstate.h"
 
-const int run_duration = 3000;
-const int maxBrightness = 60; // up to 255. More bright, more amps
-const int runningBrightness = 50; // up to 255. More bright, more amps
+const int run_duration = 4000;
+const int maxBrightness = 100; // up to 255. More bright, more amps
+const int runningBrightness = 255; // up to 255. More bright, more amps
 const int led_cylcle_time = 100; //change led color every this many ms
 const int LED_PIN = 7;
 const int NUM_LEDS = 16;
@@ -12,8 +12,8 @@ CRGB leds[NUM_LEDS];
 const int E1 = 5; // Enable Pin for motor
 const int I1 = 3; // Control pin 1 for motor
 const int I2 = 4; // Control pin 2 for motor
-const int running_speed = 200; //speed to run motors
-
+const int running_speed = 255; //speed to run motors
+const int debounce = 10;
 const int E2 = 8;
 const int I3 = 9;
 const int I4 = 10;
@@ -84,8 +84,8 @@ void lights()
 {
   //debounce doesn't seem necessary
   //unsigned long interrupt_time = millis();
-  //if (interrupt_time - lastInterruptTimestamp > 200) {}
-
+  // if (interrupt_time - lastInterruptTimestamp > debounce) {
+  lastInterruptTimestamp = millis();
   byte switchstatus = digitalRead(pulluppin);
   Serial.println("Pin is: " + String(switchstatus));
 
@@ -115,6 +115,7 @@ void lights()
       }
       break;
   }
+  //  }
 }
 
 void StopMotor()
