@@ -9,14 +9,17 @@ const int LED_PIN = 7;
 const int NUM_LEDS = 16;
 CRGB leds[NUM_LEDS];
 
-const int E1 = 5; // Enable Pin for motor
-const int I1 = 3; // Control pin 1 for motor
-const int I2 = 4; // Control pin 2 for motor
+const int EN1 = 5; // Enable Pin for motor 1
+const int IN1 = 4; // Control pin 1 for motor 1
+const int IN2 = 3; // Control pin 2 for motor 1
+
+const int EN2 = 8;  // Enable Pin for motor 2
+const int IN3 = 9;  // Control 1 pin for motor 2
+const int IN4 = 10; // Control 2 pin for motor 2
+
 const int running_speed = 255; //speed to run motors
 const int debounce = 10;
-const int E2 = 8;
-const int I3 = 9;
-const int I4 = 10;
+
 const int pulluppin = 2;
 
 carstate current_state = IDLING;
@@ -38,13 +41,13 @@ void setup() {
 
   FastLED.addLeds<WS2812, LED_PIN, GRB>(leds, NUM_LEDS);
 
-  pinMode(E1, OUTPUT);
-  pinMode(I1, OUTPUT);
-  pinMode(I2, OUTPUT);
+  pinMode(EN1, OUTPUT);
+  pinMode(IN2, OUTPUT);
+  pinMode(IN1, OUTPUT);
 
-  pinMode(E2, OUTPUT);
-  pinMode(I3, OUTPUT);
-  pinMode(I4, OUTPUT);
+  pinMode(EN2, OUTPUT);
+  pinMode(IN3, OUTPUT);
+  pinMode(IN4, OUTPUT);
 
   pinMode(pulluppin, INPUT_PULLUP);
 
@@ -120,22 +123,22 @@ void lights()
 
 void StopMotor()
 {
-  digitalWrite(E1, LOW);
-  digitalWrite(E2, LOW);
+  digitalWrite(EN1, LOW);
+  digitalWrite(EN2, LOW);
   current_state = FINISHED;
 }
 
 void StartMotor()
 {
   //Set motors speed
-  analogWrite(E1, running_speed);
-  analogWrite(E2, running_speed);
+  analogWrite(EN1, running_speed);
+  analogWrite(EN2, running_speed);
 
   //set rotation direction
-  digitalWrite(I1, HIGH);
-  digitalWrite(I2, LOW);
-  digitalWrite(I3, HIGH);
-  digitalWrite(I4, LOW);
+  digitalWrite(IN2, HIGH);
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN3, HIGH);
+  digitalWrite(IN4, LOW);
 }
 
 void finishLineLEDSequence()

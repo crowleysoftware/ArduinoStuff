@@ -1,0 +1,6 @@
+{
+    "board": "arduino:avr:uno",
+    "sketch": "buzzer\\buzzer.ino",
+    "port": "COM6",
+    "output": "c:\\deleteme\\arduinobuild"
+}
