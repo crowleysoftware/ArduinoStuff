@@ -1,7 +1,7 @@
 #include <FastLED.h>
 #include "carstate.h"
 
-const int run_duration = 4000;
+const int run_duration = 2000;
 const int maxBrightness = 100; // up to 255. More bright, more amps
 const int runningBrightness = 255; // up to 255. More bright, more amps
 const int led_cylcle_time = 100; //change led color every this many ms
@@ -45,9 +45,12 @@ void setup() {
   pinMode(IN2, OUTPUT);
   pinMode(IN1, OUTPUT);
 
-  pinMode(EN2, OUTPUT);
-  pinMode(IN3, OUTPUT);
-  pinMode(IN4, OUTPUT);
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, LOW);
+
+  //pinMode(EN2, OUTPUT);
+  //pinMode(IN3, OUTPUT);
+  //pinMode(IN4, OUTPUT);
 
   pinMode(pulluppin, INPUT_PULLUP);
 
@@ -124,7 +127,9 @@ void lights()
 void StopMotor()
 {
   digitalWrite(EN1, LOW);
-  digitalWrite(EN2, LOW);
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, LOW);
+  // digitalWrite(EN2, LOW);
   current_state = FINISHED;
 }
 
@@ -132,13 +137,13 @@ void StartMotor()
 {
   //Set motors speed
   analogWrite(EN1, running_speed);
-  analogWrite(EN2, running_speed);
+  //analogWrite(EN2, running_speed);
 
   //set rotation direction
   digitalWrite(IN2, HIGH);
   digitalWrite(IN1, LOW);
-  digitalWrite(IN3, HIGH);
-  digitalWrite(IN4, LOW);
+  //digitalWrite(IN3, HIGH);
+  // digitalWrite(IN4, LOW);
 }
 
 void finishLineLEDSequence()
