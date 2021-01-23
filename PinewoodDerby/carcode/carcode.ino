@@ -1,7 +1,7 @@
 #include <FastLED.h>
 #include "carstate.h"
 
-const int run_duration = 2000;
+const int run_duration = 5000;
 const int maxBrightness = 100; // up to 255. More bright, more amps
 const int runningBrightness = 255; // up to 255. More bright, more amps
 const int led_cylcle_time = 100; //change led color every this many ms
@@ -11,16 +11,17 @@ CRGB leds[NUM_LEDS];
 
 const int EN1 = 5; // Enable Pin for motor 1
 const int IN1 = 4; // Control pin 1 for motor 1
-const int IN2 = 3; // Control pin 2 for motor 1
+const int IN2 = 9; // Control pin 2 for motor 1
 
 const int EN2 = 8;  // Enable Pin for motor 2
-const int IN3 = 9;  // Control 1 pin for motor 2
+const int IN3 = 11;  // Control 1 pin for motor 2
 const int IN4 = 10; // Control 2 pin for motor 2
 
 const int running_speed = 255; //speed to run motors
 const int debounce = 10;
 
-const int pulluppin = 2;
+const int runTrigger = 2;
+const int stopTrigger = 3;
 
 carstate current_state = IDLING;
 
@@ -29,11 +30,10 @@ unsigned long looptime;
 unsigned long lastIdleTimestamp;
 unsigned long lastRunningTimestamp;
 unsigned long lastFinishedTimestamp;
-static unsigned long lastInterruptTimestamp;
 int finishLineLEDIteration = 0;
 
-int switchstatus = LOW;
-volatile byte switchstate = LOW;
+volatile byte startSwitchState = LOW;
+volatile byte stopSwitchState = HIGH;
 
 void setup() {
   Serial.begin(9600);
@@ -48,23 +48,22 @@ void setup() {
   digitalWrite(IN1, LOW);
   digitalWrite(IN2, LOW);
 
-  //pinMode(EN2, OUTPUT);
-  //pinMode(IN3, OUTPUT);
-  //pinMode(IN4, OUTPUT);
+  pinMode(EN2, OUTPUT);
+  pinMode(IN3, OUTPUT);
+  pinMode(IN4, OUTPUT);
 
-  pinMode(pulluppin, INPUT_PULLUP);
+  pinMode(runTrigger, INPUT_PULLUP);
+  pinMode(stopTrigger, INPUT_PULLUP);
 
   FastLED.setBrightness(maxBrightness);
   lastIdleTimestamp = millis();
   IdleLEDSequence();
 
-  attachInterrupt(digitalPinToInterrupt(pulluppin), lights, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(runTrigger), lights, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(stopTrigger), triggerStop, CHANGE);
 }
 
 void loop() {
-
-  looptime = millis();
-
   switch (current_state)
   {
     case IDLING:
@@ -72,17 +71,21 @@ void loop() {
       IdleLEDSequence();
       break;
     case RUNNING:
-      if (looptime - starttime > run_duration) {
-        StopMotor();
-        lastFinishedTimestamp = millis();
-        finishLineLEDSequence();
-      } else {
-        runningLEDSequence();
-      }
+      runningLEDSequence();
       break;
     case FINISHED:
+      StopMotor();
       finishLineLEDSequence();
       break;
+  }
+}
+
+void triggerStop()
+{
+  stopSwitchState = digitalRead(stopTrigger);
+  Serial.println("Stop Pin is: " + String(stopSwitchState));
+  if (stopSwitchState == LOW) {
+    current_state = FINISHED;
   }
 }
 
@@ -91,20 +94,20 @@ void lights()
   //debounce doesn't seem necessary
   //unsigned long interrupt_time = millis();
   // if (interrupt_time - lastInterruptTimestamp > debounce) {
-  lastInterruptTimestamp = millis();
-  byte switchstatus = digitalRead(pulluppin);
-  Serial.println("Pin is: " + String(switchstatus));
+
+  startSwitchState = digitalRead(runTrigger);
+  Serial.println("Pin is: " + String(startSwitchState));
 
   switch (current_state)
   {
     case IDLING:
-      if (switchstatus == HIGH) {
+      if (startSwitchState == HIGH) {
         current_state = READY;
         Serial.println("Transistion from IDLING to READY");
       }
       break;
     case READY:
-      if (switchstatus == LOW) {
+      if (startSwitchState == LOW) {
         current_state = RUNNING;
         StartMotor();
         starttime = millis();
@@ -115,7 +118,7 @@ void lights()
       Serial.println("No transition while running");
       break;
     case FINISHED:
-      if (switchstatus == HIGH) {
+      if (startSwitchState == HIGH) {
         current_state = READY;
         Serial.println("Transistion from FINISHED to READY");
       }
@@ -129,21 +132,22 @@ void StopMotor()
   digitalWrite(EN1, LOW);
   digitalWrite(IN1, LOW);
   digitalWrite(IN2, LOW);
-  // digitalWrite(EN2, LOW);
-  current_state = FINISHED;
+  digitalWrite(EN2, LOW);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, LOW);
 }
 
 void StartMotor()
 {
   //Set motors speed
   analogWrite(EN1, running_speed);
-  //analogWrite(EN2, running_speed);
+  analogWrite(EN2, running_speed);
 
   //set rotation direction
   digitalWrite(IN2, HIGH);
   digitalWrite(IN1, LOW);
-  //digitalWrite(IN3, HIGH);
-  // digitalWrite(IN4, LOW);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, HIGH);
 }
 
 void finishLineLEDSequence()
