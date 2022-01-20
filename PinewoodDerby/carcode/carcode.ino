@@ -6,16 +6,17 @@ const int maxBrightness = 100; // up to 255. More bright, more amps
 const int runningBrightness = 255; // up to 255. More bright, more amps
 const int led_cylcle_time = 100; //change led color every this many ms
 const int LED_PIN = 7;
+const int BZR_PIN = 8;
 const int NUM_LEDS = 16;
 CRGB leds[NUM_LEDS];
 
-const int EN1 = 5; // Enable Pin for motor 1
-const int IN1 = 4; // Control pin 1 for motor 1
-const int IN2 = 9; // Control pin 2 for motor 1
+const int EN1 = 18; // Enable Pin for motor 1
+const int IN1 = 19; // Control pin 1 for motor 1
+const int IN2 = 17; // Control pin 2 for motor 1
 
-const int EN2 = 8;  // Enable Pin for motor 2
-const int IN3 = 11;  // Control 1 pin for motor 2
-const int IN4 = 10; // Control 2 pin for motor 2
+const int EN2 = 6;  // Enable Pin for motor 2
+const int IN3 = 5;  // Control 1 pin for motor 2
+const int IN4 = 4; // Control 2 pin for motor 2
 
 const int running_speed = 255; //speed to run motors
 const int debounce = 10;
@@ -41,6 +42,8 @@ void setup() {
 
   FastLED.addLeds<WS2812, LED_PIN, GRB>(leds, NUM_LEDS);
 
+  pinMode(BZR_PIN, OUTPUT);
+
   pinMode(EN1, OUTPUT);
   pinMode(IN2, OUTPUT);
   pinMode(IN1, OUTPUT);
@@ -51,6 +54,9 @@ void setup() {
   pinMode(EN2, OUTPUT);
   pinMode(IN3, OUTPUT);
   pinMode(IN4, OUTPUT);
+
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, LOW);
 
   pinMode(runTrigger, INPUT_PULLUP);
   pinMode(stopTrigger, INPUT_PULLUP);
@@ -135,10 +141,13 @@ void StopMotor()
   digitalWrite(EN2, LOW);
   digitalWrite(IN3, LOW);
   digitalWrite(IN4, LOW);
+  digitalWrite(BZR_PIN, LOW);
 }
 
 void StartMotor()
 {
+  digitalWrite(BZR_PIN, HIGH);
+
   //Set motors speed
   analogWrite(EN1, running_speed);
   analogWrite(EN2, running_speed);
@@ -263,6 +272,7 @@ void IdleLEDSequence()
     }
     lastIdleTimestamp = millis();
   }
+
   FastLED.show();
 }
 
