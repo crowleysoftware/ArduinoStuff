@@ -1,10 +1,11 @@
 #include <FastLED.h>
 
-const int LED_PIN = 7;
+const int LED_PIN = 5;
 const int NUM_LEDS = 8;
 CRGB leds[NUM_LEDS];
 const int maxBrightness = 128;
-unsigned long delayDuration = 3000;
+unsigned long delayDuration = 5000;
+unsigned int colorIdx = 0;
 
 CRGB bgColor;
 
@@ -51,8 +52,6 @@ void loop() {
     FastLED.show();
     delay(10);
   }
-
-  FastLED.show();
 
   delay(delayDuration);
 

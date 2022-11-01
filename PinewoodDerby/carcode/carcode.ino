@@ -5,7 +5,7 @@ const int run_duration = 5000;
 const int maxBrightness = 100; // up to 255. More bright, more amps
 const int runningBrightness = 255; // up to 255. More bright, more amps
 const int led_cylcle_time = 100; //change led color every this many ms
-const int LED_PIN = 7;
+const int LED_PIN = 4;
 const int BZR_PIN = 8;
 const int NUM_LEDS = 16;
 CRGB leds[NUM_LEDS];
